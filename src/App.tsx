@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from 'react';
 
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, Typography } from '@mui/material';
 
 import { AppContext } from './context/AppContext';
 import { randomize } from './utils/helpers';
@@ -11,11 +11,14 @@ import SideButton from './components/SideButton/SideButton';
 
 // used to stringify example scripts
 import Debug from './components/Debug/Debug';
+import QuestionsModal from './components/QuestionsModal/QuestionsModal';
 const DEBUG = false;
 
 function App() {
   const { isLoading, questions, hidden, showQuestion, hideQuestion } = useContext(AppContext);
   const [counter, setCounter] = useState<number>(0);
+
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const visibleQuestions: Question[] = useMemo(() => {
     const filtered = questions.filter(q => !hidden.find(hq => hq.id === q.id));
@@ -34,8 +37,17 @@ function App() {
 
   const handleArchive = (id: string) => {
     if (visibleQuestions.length - 1 >= counter)
-      setCounter(c => --c);
+      if (counter > 0)
+        setCounter(c => --c);
     hideQuestion(id);
+  };
+
+  const restoreArchived = (id: string) => {
+    showQuestion(id);
+  };
+
+  const toggleModal = (show: boolean) => {
+    setShowModal(show);
   };
 
   let content;
@@ -48,7 +60,10 @@ function App() {
     content = (<Typography variant='h2' align='center'> All questions are hidden</Typography>);
   else
     content = (
-      <Box >
+      <Box>
+
+        <QuestionsModal isOpen={showModal} data={hidden} onHide={() => toggleModal(false)} onRestoreArchivedPost={restoreArchived} />
+
         <Grid container justifyContent='center' >
 
           <Grid item sx={{ display: { xs: 'none', md: 'block' } }} md={2}   >
@@ -64,7 +79,9 @@ function App() {
                     <HeaderButton label='LAST' onClick={showLast} />
                   </Grid>
                   <Grid item xs={4} md={12}>
-                    <Typography align='center' variant='h4'>{counter + 1} / {visibleQuestions.length}</Typography>
+                    <Button fullWidth onClick={() => toggleModal(true)}>
+                      <Typography align='center' variant='h4'>{counter + 1} / {visibleQuestions.length}</Typography>
+                    </Button>
                   </Grid>
                   <Grid item xs={4} sx={{ display: { xs: 'block', md: 'none' } }}>
                     <HeaderButton label='NEXT' onClick={showNext} />

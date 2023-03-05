@@ -38,7 +38,7 @@ const QuestionCard = ({ data, onArchive }: QuestionCardProps) => {
     return (
         <Card onClick={handleClick} sx={{ cursor: answered ? 'default' : 'pointer' }}>
             <Header>
-                <Typography variant="h5" sx={{ flex: 1 }}>
+                <Typography variant="h5" sx={{ flex: 1, textAlign: { xs: answered ? 'left' : 'center', md: 'center' } }}>
                     {question}
                 </Typography>
                 {answered &&
